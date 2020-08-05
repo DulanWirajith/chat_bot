@@ -6,7 +6,7 @@ timeframe = '2015-05'
 
 sql_transaction = []
 start_row = 0
-# cleanup = 1000000
+cleanup = 1000000
 
 # connect with db
 connection = sqlite3.connect('{}.db'.format(timeframe))
@@ -154,4 +154,12 @@ if __name__ == "__main__":
             if row_counter % 100000 == 0:
                 print('Total Rows Read: {}, Paired Rows: {}, Time: {}'.format(row_counter, paired_rows,
                                                                               str(datetime.now())))
+            if row_counter > start_row:
+                if row_counter % cleanup == 0:
+                    print("Cleanin up!")
+                    sql = "DELETE FROM parent_reply WHERE parent IS NULL"
+                    cursor.execute(sql)
+                    connection.commit()
+                    cursor.execute("VACUUM")
+                    connection.commit()
 
